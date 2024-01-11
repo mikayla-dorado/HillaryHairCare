@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using HillarysHairCare.Models;
+using HillaryHairCare.Models;
 
 namespace HillaryHairCare.Models;
 

@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,31 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+nav {
+  display: flex;
+  background-color: var(--black);
+  color: var(--white);
+  padding: 10px;
+  justify-content: space-between;
+  background-color: pink;
+}
+
+.nav-item {
+  margin-right: 50px;
+}
+
+.Navbar {
+  /* Add some padding to the Navbar */
+  padding: 10px;
+  list-style-type: none;
+}
+
+/* Style for the NavLinks */
+.NavLink {
+  /* Add some margin to the right of each NavLink */
+  margin-right: 10px;
+  /* Remove bullet points from the list items */
+  list-style-type: none;
 }
