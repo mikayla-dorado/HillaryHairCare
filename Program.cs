@@ -61,15 +61,48 @@ app.MapGet("/api/stylists", (HillaryHairCareDbContext db) =>
                 StylistId = a.StylistId,
                 CustomerId = a.CustomerId,
                 Time = a.Time,
-                Services = a.Services.Select(s => new ServiceDTO
+                Services = a.Services.Select(srv => new ServiceDTO
                 {
-                    Id = s.Id,
-                    Name = s.Name,
-                    Price = s.Price
+                    Id = srv.Id,
+                    Name = srv.Name,
+                    Price = srv.Price
                 }).ToList(),
             })
         .ToList()
     }).ToList();
+});
+
+//get services
+app.MapGet("/api/services", (HillaryHairCareDbContext db) => 
+{
+    return db.Services.Select(s => new ServiceDTO
+    {
+        Id = s.Id,
+        Name = s.Name,
+        Price = s.Price
+    });
+});
+
+//deactivate (soft delete) a stylist
+app.MapPost("/api/stylists/{id}/deactivate", (HillaryHairCareDbContext db, int id) =>
+{
+    Stylist stylistDeactivate = db.Stylists.SingleOrDefault(s => s.Id == id);
+    if (stylistDeactivate == null)
+    {
+        return Results.NotFound("nothing");
+    }
+
+    stylistDeactivate.Active = false;
+    db.SaveChanges();
+    return Results.Ok($"{stylistDeactivate.Name} has been deactivated");
+});
+
+//add a stylist
+app.MapPost("/api/stylists", (HillaryHairCareDbContext db, Stylist stylist) =>
+{
+    db.Stylists.Add(stylist);
+    db.SaveChanges();
+    return Results.Created($"/api/stylists/{stylist.Id}", stylist);
 });
 
 app.Run();

@@ -18,11 +18,11 @@ public class HillaryHairCareDbContext : DbContext
     {
         modelBuilder.Entity<Stylist>().HasData(new Stylist[]
         {
-            new Stylist {Id = 1, Name = "Keely", ServiceId = 1},
-            new Stylist {Id = 2, Name = "JP", ServiceId = 2},
-            new Stylist {Id = 3, Name = "Jose", ServiceId = 3},
-            new Stylist {Id = 4, Name = "Tamatha", ServiceId = 4},
-            new Stylist {Id = 5, Name = "Hillary", ServiceId = 1}
+            new Stylist {Id = 1, Name = "Keely", ServiceId = 1, Active = true},
+            new Stylist {Id = 2, Name = "JP", ServiceId = 2, Active = true},
+            new Stylist {Id = 3, Name = "Jose", ServiceId = 3, Active = true},
+            new Stylist {Id = 4, Name = "Tamatha", ServiceId = 4, Active = false},
+            new Stylist {Id = 5, Name = "Hillary", ServiceId = 1, Active = true}
         });
         modelBuilder.Entity<Service>().HasData(new Service[]
         {

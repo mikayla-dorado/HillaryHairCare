@@ -35,7 +35,7 @@ export const Customer = () => {
                 onChange={(event) => setCustomerEmail(event.target.value)} />
             </div>
             <div>
-                <button onClick={(event) => handleAddCustomerBtn(event)}>Submit</button>
+                <button className="submit" onClick={(event) => handleAddCustomerBtn(event)}>Submit</button>
             </div>
         </div>
     )
