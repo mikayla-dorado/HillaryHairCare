@@ -45,7 +45,8 @@ namespace HillaryHairCare.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    ServiceId = table.Column<int>(type: "integer", nullable: false)
+                    ServiceId = table.Column<int>(type: "integer", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,14 +137,14 @@ namespace HillaryHairCare.Migrations
 
             migrationBuilder.InsertData(
                 table: "Stylists",
-                columns: new[] { "Id", "Name", "ServiceId" },
+                columns: new[] { "Id", "Active", "Name", "ServiceId" },
                 values: new object[,]
                 {
-                    { 1, "Keely", 1 },
-                    { 2, "JP", 2 },
-                    { 3, "Jose", 3 },
-                    { 4, "Tamatha", 4 },
-                    { 5, "Hillary", 1 }
+                    { 1, true, "Keely", 1 },
+                    { 2, true, "JP", 2 },
+                    { 3, true, "Jose", 3 },
+                    { 4, false, "Tamatha", 4 },
+                    { 5, true, "Hillary", 1 }
                 });
 
             migrationBuilder.InsertData(

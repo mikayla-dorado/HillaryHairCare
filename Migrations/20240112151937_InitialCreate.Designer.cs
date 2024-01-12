@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HillaryHairCare.Migrations
 {
     [DbContext(typeof(HillaryHairCareDbContext))]
-    [Migration("20240111205455_InitialCreate")]
+    [Migration("20240112151937_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -249,6 +249,9 @@ namespace HillaryHairCare.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -264,30 +267,35 @@ namespace HillaryHairCare.Migrations
                         new
                         {
                             Id = 1,
+                            Active = true,
                             Name = "Keely",
                             ServiceId = 1
                         },
                         new
                         {
                             Id = 2,
+                            Active = true,
                             Name = "JP",
                             ServiceId = 2
                         },
                         new
                         {
                             Id = 3,
+                            Active = true,
                             Name = "Jose",
                             ServiceId = 3
                         },
                         new
                         {
                             Id = 4,
+                            Active = false,
                             Name = "Tamatha",
                             ServiceId = 4
                         },
                         new
                         {
                             Id = 5,
+                            Active = true,
                             Name = "Hillary",
                             ServiceId = 1
                         });

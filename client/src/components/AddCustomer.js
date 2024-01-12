@@ -2,7 +2,7 @@ import { useState } from "react"
 import {useNavigate } from "react-router-dom"
 import { addCustomer } from "../data/customerData"
 
-export const Customer = () => {
+export const AddCustomer = () => {
     const [customerName, setCustomerName] = useState("")
     const [customerEmail, setCustomerEmail]  = useState("")
     const navigate = useNavigate()

@@ -10,5 +10,6 @@ public class Stylist
     public string Name { get; set; }
     [Required]
     public int ServiceId { get; set; }
+    public List<Service> Services { get; set; }
     public bool Active { get; set; }
 }

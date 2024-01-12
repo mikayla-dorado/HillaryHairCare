@@ -53,6 +53,7 @@ app.MapGet("/api/stylists", (HillaryHairCareDbContext db) =>
         Id = s.Id,
         Name = s.Name,
         ServiceId = s.ServiceId,
+        Active = s.Active,
         Appointments = db.Appointments
             .Where(a => a.StylistId == s.Id)
             .Select(a => new AppointmentDTO
@@ -73,7 +74,7 @@ app.MapGet("/api/stylists", (HillaryHairCareDbContext db) =>
 });
 
 //get services
-app.MapGet("/api/services", (HillaryHairCareDbContext db) => 
+app.MapGet("/api/services", (HillaryHairCareDbContext db) =>
 {
     return db.Services.Select(s => new ServiceDTO
     {
@@ -83,13 +84,24 @@ app.MapGet("/api/services", (HillaryHairCareDbContext db) =>
     });
 });
 
+//get customers
+app.MapGet("/api/customers", (HillaryHairCareDbContext db) =>
+{
+    return db.Customers.Select(c => new CustomerDTO
+    {
+        Id = c.Id,
+        Name = c.Name,
+        Email = c.Email
+    });
+});
+
 //deactivate (soft delete) a stylist
 app.MapPost("/api/stylists/{id}/deactivate", (HillaryHairCareDbContext db, int id) =>
 {
     Stylist stylistDeactivate = db.Stylists.SingleOrDefault(s => s.Id == id);
     if (stylistDeactivate == null)
     {
-        return Results.NotFound("nothing");
+        return Results.NotFound("no matching id");
     }
 
     stylistDeactivate.Active = false;
@@ -100,9 +112,22 @@ app.MapPost("/api/stylists/{id}/deactivate", (HillaryHairCareDbContext db, int i
 //add a stylist
 app.MapPost("/api/stylists", (HillaryHairCareDbContext db, Stylist stylist) =>
 {
-    db.Stylists.Add(stylist);
-    db.SaveChanges();
-    return Results.Created($"/api/stylists/{stylist.Id}", stylist);
+    try
+    {
+        db.Stylists.Add(stylist);
+        db.SaveChanges();
+        return Results.Created($"/api/stylists/{stylist.Id}", stylist);
+    }
+    catch
+    {
+        return Results.BadRequest("Enter a valid Service Name");
+    }
+
 });
+
+
+
+
+
 
 app.Run();

@@ -4,9 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Customer } from './components/Customer'
+import { AddCustomer } from './components/AddCustomer'
 import { StylistList } from './components/StylistList';
 import { AddStylist } from './components/AddStylist'
+import { CustomerList } from './components/CustomerList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,7 +15,8 @@ root.render(
     <Routes>
       <Route path='/' element={<App />}>
         <Route path='/customers'>
-          <Route index element={<Customer />} />
+          <Route index element={<CustomerList />} />
+          <Route path='add' element={<AddCustomer />} />
         </Route>
         <Route path='stylists'>
           <Route index element={<StylistList />} />

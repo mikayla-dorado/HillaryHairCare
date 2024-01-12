@@ -9,3 +9,7 @@ export const addCustomer = (customerObj) => {
         body: JSON.stringify(customerObj)
     })
 }
+
+export const getCustomers = () => {
+    return fetch(`${_apiUrl}`).then(res => res.json())
+}

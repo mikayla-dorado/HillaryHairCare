@@ -35,10 +35,9 @@ export const StylistList = () => {
 
     const handleDeactivateStylistBtn = (event, id) => {
         event.preventDefault()
-        console.log(id)
-        console.log(typeof (id))
         deactivateStylist(id).then(() => getAndSetStylists())
     }
+    console.log(stylists)
 
     return (
         <div>
