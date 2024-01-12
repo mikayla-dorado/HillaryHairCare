@@ -14,6 +14,7 @@ export const AddCustomer = () => {
             name: customerName,
             email: customerEmail
         }
+        
 
         addCustomer(addACustomer).then(() => navigate("/customers"))
         //navigate back to customers after they submit their new customer info,

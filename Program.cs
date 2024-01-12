@@ -125,6 +125,58 @@ app.MapPost("/api/stylists", (HillaryHairCareDbContext db, Stylist stylist) =>
 
 });
 
+//add a service
+app.MapPost("/api/services", (HillaryHairCareDbContext db, Service service) =>
+{
+    try
+    {
+        db.Services.Add(service);
+        db.SaveChanges();
+        return Results.Created($"/api/services/{service.Id}", service);
+    }
+    catch
+    {
+        return Results.BadRequest("Enter valid Service information");
+    }
+});
+
+//get appointments
+app.MapGet("/api/appointments", (HillaryHairCareDbContext db) =>
+{
+    return db.Appointments
+    .Include(a => a.Customer)
+    .Include(a => a.Stylist)
+    .Select(a => new AppointmentDTO
+    {
+        Id = a.Id,
+        Time = a.Time,
+        CustomerId = a.CustomerId,
+        StylistId = a.StylistId,
+        Customer = new CustomerDTO
+        {
+            Id = a.Customer.Id,
+            Name = a.Customer.Name
+        },
+        Stylist = new StylistDTO
+        {
+            Id = a.Stylist.Id,
+            Name = a.Stylist.Name
+        }
+    });
+});
+
+//cancel/delete appointment
+app.MapPost("/api/appointments/{id}/delete", (HillaryHairCareDbContext db, int id) =>
+{
+    Appointment appointmentDelete = db.Appointments.SingleOrDefault(a => a.Id == id);
+    if (appointmentDelete == null)
+    {
+        return Results.NotFound();
+    }
+    db.Appointments.Remove(appointmentDelete);
+    db.SaveChanges();
+    return Results.NoContent();
+});
 
 
 

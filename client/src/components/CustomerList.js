@@ -22,7 +22,7 @@ export const CustomerList = () => {
 
     return (
         <div>
-            <h4>Customers</h4>
+            <h2>Customers</h2>
             <button onClick={event => handleAddCustomerBtn(event)}>Add a New Customer</button>
             <table>
                 <thead>
@@ -33,9 +33,9 @@ export const CustomerList = () => {
                 </thead>
                 <tbody>
                     {customers.map((c) => (
-                        <tr key={`customers-${c?.customer?.id}`}>
-                            <td>{c?.customer?.name}</td>
-                            <td>{c?.customer?.email}</td>
+                        <tr key={`customers-${c?.id}`}>
+                            <td>{c?.name}</td>
+                            <td>{c?.email}</td>
                         </tr>
                     ))}
                 </tbody>
