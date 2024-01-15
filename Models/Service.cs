@@ -5,8 +5,8 @@ namespace HillaryHairCare.Models;
 public class Service
 {
     public int Id { get; set; }
-    [Required]
+    //[Required]
     public string Name { get; set; }
-    [Required]
+    //[Required]
     public decimal Price { get; set; }
 }

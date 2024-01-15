@@ -134,9 +134,9 @@ app.MapPost("/api/services", (HillaryHairCareDbContext db, Service service) =>
         db.SaveChanges();
         return Results.Created($"/api/services/{service.Id}", service);
     }
-    catch
+    catch (Exception ex)
     {
-        return Results.BadRequest("Enter valid Service information");
+        return Results.BadRequest($"Error: {ex.Message}");
     }
 });
 
@@ -176,6 +176,13 @@ app.MapPost("/api/appointments/{id}/delete", (HillaryHairCareDbContext db, int i
     db.Appointments.Remove(appointmentDelete);
     db.SaveChanges();
     return Results.NoContent();
+});
+
+app.MapPost("/api/appointments", (HillaryHairCareDbContext db, Appointment appointment) =>
+{
+    db.Appointments.Add(appointment);
+    db.SaveChanges();
+    return Results.Created($"/api/{appointment.Id}", appointment);
 });
 
 

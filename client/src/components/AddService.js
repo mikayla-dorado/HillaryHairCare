@@ -6,19 +6,21 @@ import { addService  } from "../data/serviceData"
 export const AddService = () => {
     const [serviceName, setServiceName] = useState("")
     const [servicePrice, setServicePrice] = useState(0)
-
     const navigate = useNavigate()
 
-    const handleAddServiceBtn = (event) => {
+    console.log(serviceName)
+    console.log(servicePrice)
+
+    const handleAddServiceBtn = async (event) => {
         event.preventDefault()
 
-        const addAService = {
+        const serviceObj = {
             name: serviceName,
-            price: servicePrice
+            price: parseFloat(servicePrice)
         }
-
-        addService(addAService).then(() => navigate("/services"))
+        await addService(serviceObj).then(() => navigate("/services"))
     }
+    
 
     return (
         <div>
