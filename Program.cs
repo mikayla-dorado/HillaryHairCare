@@ -178,14 +178,110 @@ app.MapPost("/api/appointments/{id}/delete", (HillaryHairCareDbContext db, int i
     return Results.NoContent();
 });
 
+//add addpointment
 app.MapPost("/api/appointments", (HillaryHairCareDbContext db, Appointment appointment) =>
 {
-    db.Appointments.Add(appointment);
+    var addAppt = new Appointment
+    {
+        CustomerId = appointment.CustomerId,
+        StylistId = appointment.StylistId,
+        Time = appointment.Time
+    };
+
+    db.Appointments.Add(addAppt);
+    db.SaveChanges();
+
+    foreach (var service in appointment.Services)
+    {
+        var aService = new AppointmentService
+        {
+            AppointmentId = addAppt.Id,
+            ServiceId = service.Id
+        };
+        db.AppointmentServices.Add(aService);
+    }
+
     db.SaveChanges();
     return Results.Created($"/api/{appointment.Id}", appointment);
 });
 
+//get appointments by id
+app.MapGet("/api/appointments/{id}", (HillaryHairCareDbContext db, int id) =>
+{
 
+    List<Service> foundServices = db.AppointmentServices
+        .Where(apt => apt.AppointmentId == id)
+        .Join(db.Services,
+        apt => apt.ServiceId,
+        s => s.Id,
+        (apt, s) => s).ToList();
+
+    Appointment foundAppointment = db.Appointments
+        .Include(a => a.Stylist)
+        .Include(a => a.Customer)
+        .FirstOrDefault(a => a.Id == id);
+
+
+    if (foundAppointment == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(new AppointmentDTO
+    {
+        Id = foundAppointment.Id,
+        StylistId = foundAppointment.StylistId,
+        CustomerId = foundAppointment.CustomerId,
+        Time = foundAppointment.Time,
+        Services = foundServices.Select(s => new ServiceDTO
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Price = s.Price
+        }).ToList(),
+        Customer = new CustomerDTO
+        {
+            Id = foundAppointment.Customer.Id,
+            Name = foundAppointment.Customer.Name,
+            Email = foundAppointment.Customer.Email
+        },
+        Stylist = new StylistDTO
+        {
+            Id = foundAppointment.Stylist.Id,
+            Name = foundAppointment.Stylist.Name,
+            Active = foundAppointment.Stylist.Active
+        }
+    });
+});
+
+//get appointment services
+app.MapGet("/api/appointmentservices", (HillaryHairCareDbContext db) =>
+{
+    return db.AppointmentServices.Select(s => new AppointmentServiceDTO
+    {
+        Id = s.Id,
+        AppointmentId = s.AppointmentId,
+        ServiceId = s.ServiceId
+    });
+});
+
+//update appointment services
+app.MapPut("/api/appointments/{id}", (HillaryHairCareDbContext db, int id, Appointment appointment) =>
+{
+    Appointment existingAppointment = db.Appointments.SingleOrDefault(a => a.Id == id);
+    if (existingAppointment == null)
+    {
+        return Results.NotFound();
+    }
+    existingAppointment.Time = appointment.Time;
+    existingAppointment.CustomerId = appointment.CustomerId;
+    existingAppointment.StylistId = appointment.StylistId;
+
+    db.SaveChanges();
+
+    return Results.NoContent();
+
+});
 
 
 

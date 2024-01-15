@@ -11,5 +11,6 @@ public class Stylist
     [Required]
     public int ServiceId { get; set; }
     public List<Service> Services { get; set; }
+    public List<Appointment> Appointments { get; set; }
     public bool Active { get; set; }
 }

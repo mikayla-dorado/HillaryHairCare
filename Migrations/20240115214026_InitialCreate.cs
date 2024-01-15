@@ -88,7 +88,8 @@ namespace HillaryHairCare.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    AppointmentId = table.Column<int>(type: "integer", nullable: true)
+                    AppointmentId = table.Column<int>(type: "integer", nullable: true),
+                    StylistId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -97,6 +98,11 @@ namespace HillaryHairCare.Migrations
                         name: "FK_Services_Appointments_AppointmentId",
                         column: x => x.AppointmentId,
                         principalTable: "Appointments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Services_Stylists_StylistId",
+                        column: x => x.StylistId,
+                        principalTable: "Stylists",
                         principalColumn: "Id");
                 });
 
@@ -126,13 +132,13 @@ namespace HillaryHairCare.Migrations
 
             migrationBuilder.InsertData(
                 table: "Services",
-                columns: new[] { "Id", "AppointmentId", "Name", "Price" },
+                columns: new[] { "Id", "AppointmentId", "Name", "Price", "StylistId" },
                 values: new object[,]
                 {
-                    { 1, null, "Highlights", 120.00m },
-                    { 2, null, "Haircut", 20.00m },
-                    { 3, null, "Beard Trim", 8.00m },
-                    { 4, null, "All-Over Color", 80.00m }
+                    { 1, null, "Highlights", 120.00m, null },
+                    { 2, null, "Haircut", 20.00m, null },
+                    { 3, null, "Beard Trim", 8.00m, null },
+                    { 4, null, "All-Over Color", 80.00m, null }
                 });
 
             migrationBuilder.InsertData(
@@ -173,6 +179,11 @@ namespace HillaryHairCare.Migrations
                 name: "IX_Services_AppointmentId",
                 table: "Services",
                 column: "AppointmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_StylistId",
+                table: "Services",
+                column: "StylistId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

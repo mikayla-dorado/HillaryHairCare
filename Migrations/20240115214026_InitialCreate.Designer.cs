@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HillaryHairCare.Migrations
 {
     [DbContext(typeof(HillaryHairCareDbContext))]
-    [Migration("20240112151937_InitialCreate")]
+    [Migration("20240115214026_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -208,9 +208,14 @@ namespace HillaryHairCare.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
+                    b.Property<int?>("StylistId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
+
+                    b.HasIndex("StylistId");
 
                     b.ToTable("Services");
 
@@ -325,9 +330,18 @@ namespace HillaryHairCare.Migrations
                     b.HasOne("HillaryHairCare.Models.Appointment", null)
                         .WithMany("Services")
                         .HasForeignKey("AppointmentId");
+
+                    b.HasOne("HillaryHairCare.Models.Stylist", null)
+                        .WithMany("Services")
+                        .HasForeignKey("StylistId");
                 });
 
             modelBuilder.Entity("HillaryHairCare.Models.Appointment", b =>
+                {
+                    b.Navigation("Services");
+                });
+
+            modelBuilder.Entity("HillaryHairCare.Models.Stylist", b =>
                 {
                     b.Navigation("Services");
                 });
