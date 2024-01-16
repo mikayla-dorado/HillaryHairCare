@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,20 +11,6 @@ namespace HillaryHairCare.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AppointmentServices",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    AppointmentId = table.Column<int>(type: "integer", nullable: false),
-                    ServiceId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppointmentServices", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
@@ -61,7 +48,8 @@ namespace HillaryHairCare.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
                     StylistId = table.Column<int>(type: "integer", nullable: false),
-                    Time = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    Time = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ServiceIds = table.Column<List<int>>(type: "integer[]", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -106,16 +94,30 @@ namespace HillaryHairCare.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "AppointmentServices",
-                columns: new[] { "Id", "AppointmentId", "ServiceId" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "AppointmentServices",
+                columns: table => new
                 {
-                    { 1, 1, 1 },
-                    { 2, 2, 1 },
-                    { 3, 3, 3 },
-                    { 4, 4, 3 },
-                    { 5, 5, 1 }
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    AppointmentId = table.Column<int>(type: "integer", nullable: false),
+                    ServiceId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppointmentServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AppointmentServices_Appointments_AppointmentId",
+                        column: x => x.AppointmentId,
+                        principalTable: "Appointments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AppointmentServices_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -155,14 +157,26 @@ namespace HillaryHairCare.Migrations
 
             migrationBuilder.InsertData(
                 table: "Appointments",
-                columns: new[] { "Id", "CustomerId", "StylistId", "Time" },
+                columns: new[] { "Id", "CustomerId", "ServiceIds", "StylistId", "Time" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, new DateTime(2024, 2, 4, 10, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 5, 2, new DateTime(2024, 2, 5, 8, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 3, 3, new DateTime(2024, 2, 4, 11, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, 2, 3, new DateTime(2024, 2, 3, 9, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, 4, 5, new DateTime(2024, 2, 4, 2, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 1, null, 1, new DateTime(2024, 2, 4, 10, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 5, null, 2, new DateTime(2024, 2, 5, 8, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 3, null, 3, new DateTime(2024, 2, 4, 11, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 2, null, 3, new DateTime(2024, 2, 3, 9, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, 4, null, 5, new DateTime(2024, 2, 4, 2, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AppointmentServices",
+                columns: new[] { "Id", "AppointmentId", "ServiceId" },
+                values: new object[,]
+                {
+                    { 1, 1, 1 },
+                    { 2, 2, 1 },
+                    { 3, 3, 3 },
+                    { 4, 4, 3 },
+                    { 5, 5, 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -174,6 +188,16 @@ namespace HillaryHairCare.Migrations
                 name: "IX_Appointments_StylistId",
                 table: "Appointments",
                 column: "StylistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppointmentServices_AppointmentId",
+                table: "AppointmentServices",
+                column: "AppointmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppointmentServices_ServiceId",
+                table: "AppointmentServices",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Services_AppointmentId",

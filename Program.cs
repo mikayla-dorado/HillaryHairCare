@@ -255,33 +255,102 @@ app.MapGet("/api/appointments/{id}", (HillaryHairCareDbContext db, int id) =>
 });
 
 //get appointment services
+//this uses a join table 'services' to get the names of the services since appointmentservices only have a serviceId
 app.MapGet("/api/appointmentservices", (HillaryHairCareDbContext db) =>
 {
-    return db.AppointmentServices.Select(s => new AppointmentServiceDTO
+    return db.AppointmentServices
+             .Join(db.Services, // Assuming you have a Services table with a Name property
+                 appointmentService => appointmentService.ServiceId,
+                 service => service.Id,
+                 (appointmentService, service) => new
+                 {
+                     Id = appointmentService.Id,
+                     AppointmentId = appointmentService.AppointmentId,
+                     ServiceId = service.Id,
+                     ServiceName = service.Name // This is the additional property for the service name
+                 }
+             ).ToList();
+});
+
+//get appointment services by id
+app.MapGet("/api/appointmentservices/{id}", (HillaryHairCareDbContext db, int id) =>
+{
+    AppointmentService foundAppointmentService = db.AppointmentServices.SingleOrDefault(a => a.Id == id);
+    if (foundAppointmentService == null)
     {
-        Id = s.Id,
-        AppointmentId = s.AppointmentId,
-        ServiceId = s.ServiceId
+        return Results.NotFound();
+    }
+    return Results.Ok(new AppointmentServiceDTO
+    {
+        Id = foundAppointmentService.Id,
+        AppointmentId = foundAppointmentService.AppointmentId,
+        ServiceId = foundAppointmentService.ServiceId
     });
 });
 
-//update appointment services
-app.MapPut("/api/appointments/{id}", (HillaryHairCareDbContext db, int id, Appointment appointment) =>
+app.MapPost("/api/appointmentservices/{id}", (HillaryHairCareDbContext db, int id, List<int> serviceIds) =>
 {
-    Appointment existingAppointment = db.Appointments.SingleOrDefault(a => a.Id == id);
+   // Get the existing appointment
+   var existingAppointment = db.Appointments.Find(id);
+   if (existingAppointment == null)
+   {
+       return Results.NotFound();
+   }
+
+   // Clear existing services
+   db.AppointmentServices.RemoveRange(db.AppointmentServices.Where(a => a.AppointmentId == id));
+
+   // Add new services
+   foreach (var serviceId in serviceIds)
+   {
+       db.AppointmentServices.Add(new AppointmentService
+       {
+           AppointmentId = id,
+           ServiceId = serviceId
+       });
+   }
+
+   db.SaveChanges();
+
+   return Results.NoContent();
+});
+
+
+//update appointment services
+app.MapPut("/api/appointmentservices/{id}", (HillaryHairCareDbContext db, int id, Appointment updatedAppointment) =>
+{
+    Appointment existingAppointment = db.Appointments
+        .Include(a => a.AppointmentServices)
+        .SingleOrDefault(a => a.Id == id);
+
     if (existingAppointment == null)
     {
         return Results.NotFound();
     }
-    existingAppointment.Time = appointment.Time;
-    existingAppointment.CustomerId = appointment.CustomerId;
-    existingAppointment.StylistId = appointment.StylistId;
 
+    // Update appointment properties
+    existingAppointment.Time = updatedAppointment.Time;
+    existingAppointment.CustomerId = updatedAppointment.CustomerId;
+    existingAppointment.StylistId = updatedAppointment.StylistId;
+
+    // Clear existing appointment services
+    existingAppointment.AppointmentServices.Clear();
+
+    // Add new appointment services based on the provided ServiceIds
+    foreach (var serviceId in updatedAppointment.ServiceIds)
+    {
+        existingAppointment.AppointmentServices.Add(new AppointmentService
+        {
+            ServiceId = serviceId
+        });
+    }
+
+    // Save changes to the database
     db.SaveChanges();
 
     return Results.NoContent();
-
 });
+
 
 
 

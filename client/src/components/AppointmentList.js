@@ -19,7 +19,7 @@ export const AppointmentList = () => {
         event.preventDefault()
         editAppointment(id).then(() => getandSetAppointments())
 
-        navigate("/appointments/edit")
+        navigate(`/appointments/edit/${id}`)
     }
 
     const handleDeleteAppointmentBtn = (event, id) => {
@@ -69,7 +69,7 @@ export const AppointmentList = () => {
                             <td>{a?.stylist?.name}</td>
                             <td>{formatDateTime(a?.time)}</td>
                             <td><button onClick={(event) => handleDeleteAppointmentBtn(event, a.id)}>Cancel Appointment</button></td>
-                            <td><button onClick={(event) => handleEditAppointmentBtn(event)}>Edit Appointment</button></td>
+                            <td><button onClick={(event) => handleEditAppointmentBtn(event, a.id)}>Edit Appointment</button></td>
                         </tr>
                     ))}
                 </tbody>

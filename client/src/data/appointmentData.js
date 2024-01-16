@@ -14,6 +14,10 @@ export const getAppointmentServices = () => {
     return fetch(`/api/appointmentservices`).then(res => res.json())
 }
 
+export const getAppointmentServicesByAppointmentId = (id) => {
+    return fetch(`/api/appointmentservices/${id}`).then(res => res.json())
+}
+
 export const deleteAppointment = (id) => {
     return fetch(`${_apiUrl}/${id}/delete`, {
         method: "POST",

@@ -1,70 +1,12 @@
-// import { useState, useEffect } from "react"
-// import { useParams, useNavigate } from "react-router-dom"
-// import { editAppointment, getAppointments, getAppointmentsById } from "../data/appointmentData"
-
-// export const EditAppointment = () => {
-//     const [appointments, setAppointments] = useState([])
-//     const [customer, setCustomer] = useState([])
-//     const [service, setService] = useState([])
-//     const [stylist, setStylist] = useState([])
-
-//     const { id } = useParams()
-//     const navigate = useNavigate()
-
-//     const getandSetAppointments = () => {
-//         getAppointments().then((array) => setAppointments(array))
-//     }
-
-//     useEffect(() => {
-//         getandSetAppointments()
-//     }, [])
-
-//     useEffect(() => {
-//         getAppointmentsById(id).then((data) => setAppointments(data))
-//     })
-
-//     const handleEditAppointmentBtn = (event, id) => {
-//         event.preventDefault()
-//         editAppointment(id).then(() => getandSetAppointments())
-
-//         navigate("/appointments/edit")
-//     }
-
-//     const handleSubmit = (event) => {
-//         event.preventDefault()
-//         if (appointments.time && appointments.customerId && appointments.stylistId) {
-//             editAppointment(appointments).then(navigate("/appointments"))
-//         } else {
-//             window.alert("Please continue filling out the form")
-//         }
-//     }
-
-//     return(
-//         <div>
-//             <h2>Edit an Appointment</h2>
-//             <form>
-//                 <p>Customer Name:</p>
-//                 <input
-//                 type="text"
-//                 value={customer?.name}
-//                 onChange={e => {
-//                     const appointmentCopy = {...appointments}
-//                     appointmentCopy.name = e.target.value
-//                     setCustomer(appointmentCopy)
-//                 }}
-//                 />
-//             </form>
-//         </div>
-//     )
-// }
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { editAppointment, getAppointmentServices, getAppointments, getAppointmentsById } from "../data/appointmentData";
+import { editAppointment, getAppointmentServices, getAppointments, getAppointmentsById, getAppointmentServicesByAppointmentId } from "../data/appointmentData";
 import { getCustomers } from "../data/customerData"
 import { getStylists } from "../data/stylistData"
 
 export const EditAppointment = () => {
     const [appointment, setAppointment] = useState({});
+    const [appointmentTime, setAppointmentTime] = useState("")
     const [services, setServices] = useState([]);
     const [appointmentServices, setAppointmentServices] = useState([])
     const [customers, setCustomers] = useState([]);
@@ -73,27 +15,31 @@ export const EditAppointment = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // const getAndSetAppointments = () => {
-    //     getAppointments().then((array) => {
-    //         const selectedAppointment = array.find((app) => app.id === parseInt(id));
-    //         setAppointment(selectedAppointment);
-    //         setServices(selectedAppointment.services || []); // Assuming the appointment object has a 'services' property
-    //     });
-    // };
-    const getAndSetAppointments = () => {
-        getAppointments().then((array) => {
-            const selectedAppointment = array.find((app) => app.id === parseInt(id));
-            console.log("Selected Appointment:", selectedAppointment);
-    
-            if (selectedAppointment && selectedAppointment.services) {
-                console.log("Services:", selectedAppointment.services);
-                setServices(selectedAppointment.services.map(serviceId => ({ serviceId })));
+
+    const getAndSetAppointments = async () => {
+        try {
+            const appointmentsArray = await getAppointments();
+            const selectedAppointment = appointmentsArray.find((app) => app.id === parseInt(id));
+            setAppointmentTime(selectedAppointment.time);
+
+            if (selectedAppointment) {
+                // Assuming services are fetched from the AppointmentServices entity
+                const appointmentServices = await getAppointmentServicesByAppointmentId(selectedAppointment.id);
+
+                console.log("Appointment Services:", appointmentServices);
+
+                // Map service IDs to an array of objects with serviceId
+                const services = appointmentServices.map((service) => ({ serviceId: service.serviceId }));
+
+                setServices(services);
             } else {
                 setServices([]);
             }
-    
+
             setAppointment(selectedAppointment);
-        });
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+        }
     };
 
 
@@ -123,15 +69,22 @@ export const EditAppointment = () => {
 
     const getAndSetAppointmentServices = () => {
         getAppointmentServices().then((data) => setAppointmentServices(data))
+        console.log(appointmentServices)
     }
 
     useEffect(() => {
         getAndSetAppointmentServices()
     }, [])
 
-    const handleServiceChange = (index, newValue) => {
-        const updatedServices = [...services];
-        updatedServices[index] = newValue;
+    const handleServiceCheckboxChange = (serviceId, isChecked) => {
+        let updatedServices = [...services];
+        if (isChecked) {
+            // Add serviceId to services array
+            updatedServices.push({ serviceId });
+        } else {
+            // Remove serviceId from services array
+            updatedServices = updatedServices.filter(service => service.serviceId !== serviceId);
+        }
         setServices(updatedServices);
     };
 
@@ -145,8 +98,6 @@ export const EditAppointment = () => {
         }
     };
 
-    console.log(services) //services is an empty array
-    //selected appointment is undefined
 
     return (
         <div>
@@ -179,25 +130,30 @@ export const EditAppointment = () => {
                     </select>
                 </div>
                 <div>
-                    <p>Services:</p>
-                    {services && Array.isArray(services) && services.length > 0 ? (
-                        services.map((appointmentService, index) => (
-                            <select
-                                key={index}
-                                value={appointmentService.serviceId}
-                                onChange={(event) => handleServiceChange(index, event.target.value)}
-                            >
-                                {appointmentServices.map((service) => (
-                                    <option key={service.id} value={service.id}>
-                                        {service?.name}
-                                    </option>
-                                ))}
-                            </select>
-                        ))
-                    ) : (
-                        <p>No services available</p>
-                    )}
+                    <p>Time:</p>
+                    <input
+                        type="datetime-local"
+                        value={appointment.time}
+                        onChange={(event) => {
+                            const newTime = new Date(event.target.value)
 
+                            setAppointment({...appointment, time: newTime})
+                        }}
+                    />
+                </div>
+                <div>
+                    <p>Services:</p>
+                    {appointmentServices.map((service, index) => (
+                        <div key={service.id}>
+                            <input
+                                type="checkbox"
+                                id={`service-${service.id}`}
+                                checked={services.some(s => s.serviceId === service.id)}
+                                onChange={(e) => handleServiceCheckboxChange(service.id, e.target.checked)}
+                            />
+                            <label htmlFor={`service-${service.id}`}>{service.serviceName}</label>
+                        </div>
+                    ))}
                 </div>
                 <button type="submit">Save Changes</button>
             </form>

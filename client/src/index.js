@@ -34,7 +34,7 @@ root.render(
         <Route path='appointments'>
           <Route index element={<AppointmentList />} />
           <Route path='add' element={<AddAppointment />} />
-          <Route path='edit' element={<EditAppointment />} />
+          <Route path='edit/:id' element={<EditAppointment />} />
         </Route>
       </Route>
     </Routes>
