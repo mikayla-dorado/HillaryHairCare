@@ -60,7 +60,6 @@ export const AppointmentList = () => {
                         <th>Stylist</th>
                         <th>Time</th>
                         <td><button onClick={(event) => handleAddAppointmentBtn(event)}>Add Appointment</button></td>
-                        <td><button onClick={(event) => handleEditAppointmentBtn(event)}>Edit Appointment</button></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +69,7 @@ export const AppointmentList = () => {
                             <td>{a?.stylist?.name}</td>
                             <td>{formatDateTime(a?.time)}</td>
                             <td><button onClick={(event) => handleDeleteAppointmentBtn(event, a.id)}>Cancel Appointment</button></td>
+                            <td><button onClick={(event) => handleEditAppointmentBtn(event)}>Edit Appointment</button></td>
                         </tr>
                     ))}
                 </tbody>
